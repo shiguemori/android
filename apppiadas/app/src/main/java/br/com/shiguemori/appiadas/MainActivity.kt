@@ -10,6 +10,8 @@ import java.util.*
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
+    var oldNumberJoker = -1
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -21,7 +23,7 @@ class MainActivity : AppCompatActivity() {
             playSong()
             Handler(Looper.getMainLooper()).postDelayed({
                 binding.btTellJoker.isEnabled = true
-            }, 3000)
+            }, 2000)
         }
     }
 
@@ -32,8 +34,16 @@ class MainActivity : AppCompatActivity() {
 
     fun showJoker() {
         val jokers = resources.getStringArray(R.array.jokers)
-        val numberJoker = Random().nextInt(jokers.size)
-        val joker = jokers[numberJoker]
+        this.oldNumberJoker = this.genNumberJoker(jokers.size)
+        val joker = jokers[this.oldNumberJoker]
         binding.tvJoker.text = joker
+    }
+
+    private fun genNumberJoker(size: Int): Int {
+        var numberJoker = Random().nextInt(size)
+        if (this.oldNumberJoker == numberJoker) {
+            numberJoker = this.genNumberJoker(size)
+        }
+        return numberJoker
     }
 }
