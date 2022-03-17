@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="jokers">
+        <item>@string/joker_one</item>
+        <item>@string/joker_two</item>
+    </string-array>
+</resources>
