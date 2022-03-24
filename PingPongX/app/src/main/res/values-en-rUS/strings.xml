@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Ping Pong X</string>
+    <string name="casa" translatable="false">home</string>
+    <string name="visitante" translatable="false">visitors</string>
+    <string name="ponto" translatable="false">score</string>
+    <string name="terminar_partida" translatable="false">End Game</string>
+    <string name="revanche" translatable="false">Rematch</string>
+    <string name="reset" translatable="false">Reset</string>
+</resources>
