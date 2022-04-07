@@ -1,5 +1,6 @@
 package br.com.shiguemori.pokedex.model
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
@@ -44,8 +45,9 @@ class MainActivity : AppCompatActivity() {
             .instance
             ?.pesquisar(name)
             ?.enqueue(object : Callback<Pokemon> {
+                @SuppressLint("SetTextI18n")
                 override fun onResponse(call: Call<Pokemon>, response: Response<Pokemon>) {
-                    findViewById<TextView>(R.id.tvPokemonName).text = response.body()?.name
+                    findViewById<TextView>(R.id.tvPokemonName).text = response.body()?.order + " - " + response.body()?.name
                     Picasso.get()
                         .load(response.body()?.sprites?.back_default)
                         .into(ivPokemonBack)
