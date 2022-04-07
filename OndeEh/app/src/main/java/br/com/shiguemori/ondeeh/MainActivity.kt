@@ -1,78 +1,57 @@
 package br.com.shiguemori.ondeeh
 
 import android.os.Bundle
-import android.widget.Button
-import android.widget.EditText
-import android.widget.TextView
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import br.com.shiguemori.ondeeh.data.remote.APIService
-import br.com.shiguemori.ondeeh.model.Endereco
-import retrofit2.Call
-import retrofit2.Response
+import androidx.lifecycle.ViewModelProvider
+import br.com.shiguemori.ondeeh.databinding.ActivityMainBinding
+import br.com.shiguemori.ondeeh.model.MainViewModel
+import br.com.shiguemori.ondeeh.model.ViewState
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var etCEP: EditText
-    private lateinit var btPesquisar: Button
-    private lateinit var tvLogradouro: TextView
-    private lateinit var tvBairro: TextView
-    private lateinit var tvLocalidade: TextView
-    private lateinit var tvUF: TextView
+    private lateinit var binding: ActivityMainBinding
+    private lateinit var mainViewModel: MainViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        setUpView()
-        setUpListener()
-    }
 
-    private fun setUpListener() {
-        btPesquisar.setOnClickListener {
-            pesquisar()
+        binding = ActivityMainBinding.inflate(layoutInflater)
+
+        mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
+
+        setContentView(binding.root)
+
+        binding.btPesquisar.setOnClickListener {
+            mainViewModel.pesquisar(binding.etCep.text.toString())
         }
+
+        registrarObserver()
     }
 
-    private fun pesquisar() {
-        APIService
-            .instance
-            ?.pesquisar(etCEP.text.toString())
-            ?.enqueue(object : retrofit2.Callback<Endereco> {
-                override fun onResponse(call: Call<Endereco>, response: Response<Endereco>) {
-                    if (response.isSuccessful) {
-                        response.body()?.let {
-                            tvLogradouro.text = it.logradouro
-                            tvBairro.text = it.bairro
-                            tvLocalidade.text = it.localidade
-                            tvUF.text = it.uf
-                        }
-                    } else {
-                        Toast.makeText(this@MainActivity, "CEP não encontrado", Toast.LENGTH_SHORT)
-                            .show()
-                        tvLogradouro.text = "N/A"
-                        tvBairro.text = "N/A"
-                        tvLocalidade.text = "N/A"
-                        tvUF.text = "N/A"
-                    }
+    private fun registrarObserver() {
+        mainViewModel.enderecoResponse.observe(this, androidx.lifecycle.Observer {
+            when (it) {
+                is ViewState.Success -> {
+                    binding.tvLogradouro.text = it.data.logradouro
+                    binding.tvBairro.text = it.data.bairro
+                    binding.tvLocalidade.text = it.data.localidade
+                    binding.tvUF.text = it.data.uf
+                    binding.loadingLayout.visibility = View.GONE
                 }
-
-                override fun onFailure(call: Call<Endereco>, t: Throwable) {
-                    Toast.makeText(this@MainActivity, t.message.toString(), Toast.LENGTH_SHORT)
-                        .show()
-                    tvLogradouro.text = "N/A"
-                    tvBairro.text = "N/A"
-                    tvLocalidade.text = "N/A"
-                    tvUF.text = "N/A"
+                is ViewState.Error -> {
+                    Toast.makeText(this, it.error.message, Toast.LENGTH_LONG).show()
+                    binding.tvLogradouro.text = "N/A"
+                    binding.tvBairro.text = "N/A"
+                    binding.tvLocalidade.text = "N/A"
+                    binding.tvUF.text = "N/A"
+                    binding.loadingLayout.visibility = View.GONE
                 }
-            })
-    }
-
-    private fun setUpView() {
-        etCEP = findViewById(R.id.etCep)
-        btPesquisar = findViewById(R.id.btPesquisar)
-        tvLogradouro = findViewById(R.id.tvLogradouro)
-        tvBairro = findViewById(R.id.tvBairro)
-        tvLocalidade = findViewById(R.id.tvLocalidade)
-        tvUF = findViewById(R.id.tvUF)
+                is ViewState.Loading -> {
+                    binding.loadingLayout.visibility = View.VISIBLE
+                }
+            }
+        })
     }
 }
