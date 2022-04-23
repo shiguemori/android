@@ -20,6 +20,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContentView(R.layout.activity_main)
         setUpView()
         setUpListener()
@@ -31,7 +32,7 @@ class MainActivity : AppCompatActivity() {
         ivPokemonFront = findViewById<ImageView>(R.id.ivPokemon2)
         btnPesquisar = findViewById<Button>(R.id.btnPesquisar)
         pokemonName = findViewById<EditText>(R.id.pokemonName)
-        pesquisar("pikachu")
+        pesquisar()
     }
 
     private fun setUpListener() {
@@ -41,16 +42,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun pesquisar(name: String = "bulbasaur") {
-        APIService
-            .instance
-            ?.pesquisar(name)
-            ?.enqueue(object : Callback<Pokemon> {
+        APIService.instance?.pesquisar(name)?.enqueue(object : Callback<Pokemon> {
                 @SuppressLint("SetTextI18n")
                 override fun onResponse(call: Call<Pokemon>, response: Response<Pokemon>) {
                     findViewById<TextView>(R.id.tvPokemonName).text = response.body()?.order + " - " + response.body()?.name
-                    Picasso.get()
-                        .load(response.body()?.sprites?.back_default)
-                        .into(ivPokemonBack)
+                    Picasso.get().load(response.body()?.sprites?.back_default).into(ivPokemonBack)
                     Picasso.get()
                         .load(response.body()?.sprites?.front_default)
                         .into(ivPokemonFront)
